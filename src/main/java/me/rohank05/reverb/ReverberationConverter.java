@@ -45,9 +45,11 @@ public class ReverberationConverter implements Converter {
 
     @Override
     public void process(float[] input, int inputOffset, float[] output, int outputOffset, int samples) {
-        int delaySamples = (int) ((float) delay * sampleRate);
-        for(int i = 0; i < input.length-delaySamples; i++){
-            output[i+delaySamples] += (input[i] *decay);
+        float delaySample = (float) (delay*sampleRate);
+        for(int i = 0; i < samples; i++){
+            float current = input[i+inputOffset];
+            current += delaySample * decay;
+            output[i+outputOffset] = current;
         }
     }
 }
