@@ -25,7 +25,7 @@ public class EchoPcmAudioFilter extends ConverterPcmAudioFilter<EchoConverter> {
     }
 
     /**
-     * @param echoLength A new echo buffer length in seconds.
+     * @param delay A new echo buffer length in seconds.
      */
     public EchoPcmAudioFilter setDelay(double delay){
         for(EchoConverter converter: converters()){
