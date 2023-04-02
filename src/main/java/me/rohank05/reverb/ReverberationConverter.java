@@ -20,36 +20,66 @@ import com.github.natanbc.lavadsp.Converter;
 
 public class ReverberationConverter implements Converter {
     private final int sampleRate;
-    private double delay;
-    private float decay;
+    private float[] delays = {0.1f, 0.2f, 0.3f, 0.4f};
+    private float[] gains = {0.3f, 0.2f, 0.1f, 0.05f};
+    private final float[] buffers;
+
+    private int position;
 
     public ReverberationConverter(int sampleRate){
         this.sampleRate = sampleRate;
+        this.buffers = new float[calculateBufferSize()];
     }
 
-    /**
-     * @param delay A delay in seconds.
-     */
-    public void setDelay(double delay) {
-        this.delay = delay;
+    public void setDelays(float[] delays){
+        this.delays = delays;
     }
 
-    /**
-     * A decay, should be a value between zero and one.
-     * @param decay the new decay (preferably between zero and one).
-     */
-    public void setDecay(float decay) {
-        this.decay = decay;
+    public void setGains(float[] gains){
+        this.gains = gains;
     }
 
+    private int calculateBufferSize(){
+        int maxDelay = (int) (sampleRate * delays[0]);
+        for (int i = 1; i < delays.length; i++) {
+            maxDelay = Math.max(maxDelay, (int) (sampleRate * delays[i]));
+        }
+        return maxDelay;
+    }
 
     @Override
     public void process(float[] input, int inputOffset, float[] output, int outputOffset, int samples) {
-        float delaySample = (float) (delay*sampleRate);
-        for(int i = 0; i < samples; i++){
-            float current = input[i+inputOffset];
-            current += delaySample * decay;
-            output[i+outputOffset] = current;
+        for (int i = 0; i < samples; i++) {
+            float current = input[i + inputOffset];
+            float outputSample = 0;
+
+            // Process each delay line
+            for (int j = 0; j < delays.length; j++) {
+                int delaySamples = (int) (sampleRate * delays[j]);
+                float gain = gains[j];
+
+                // Read from delay buffer
+                int readPosition = position - delaySamples;
+                if (readPosition < 0) {
+                    readPosition += buffers.length;
+                }
+                float delayedSample = buffers[readPosition];
+
+                // Update delay buffer
+                buffers[position] = current + (delayedSample * gain);
+
+                // Update output sample
+                outputSample += delayedSample;
+
+                // Update position
+                position++;
+                if (position >= buffers.length) {
+                    position = 0;
+                }
+            }
+
+            // Add the output sample to the current sample
+            output[i + outputOffset] = current + (outputSample / delays.length);
         }
     }
 }
