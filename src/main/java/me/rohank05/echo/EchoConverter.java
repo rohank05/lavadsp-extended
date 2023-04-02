@@ -21,9 +21,9 @@ import com.github.natanbc.lavadsp.Converter;
 public class EchoConverter implements Converter {
     private final int sampleRate;
     private float[] echoBuffer;
-    private double delay;
+    private double delay = 0;
     private int position;
-    private float decay;
+    private float decay = 0;
     public EchoConverter(int sampleRate){
         this.sampleRate = sampleRate;
     }
