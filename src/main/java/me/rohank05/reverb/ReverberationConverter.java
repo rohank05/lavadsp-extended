@@ -20,8 +20,8 @@ import com.github.natanbc.lavadsp.Converter;
 
 public class ReverberationConverter implements Converter {
     private final int sampleRate;
-    private float[] delays = {0.1f, 0.2f, 0.3f, 0.4f};
-    private float[] gains = {0.3f, 0.2f, 0.1f, 0.05f};
+    private float[] delays = {0.037f, 0.042f, 0.048f, 0.053f};
+    private float[] gains = {0.84f, 0.83f, 0.82f, 0.81f};
     private final float[] buffers;
 
     private int position;
